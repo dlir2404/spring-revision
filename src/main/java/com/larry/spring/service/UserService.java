@@ -1,14 +1,15 @@
 package com.larry.spring.service;
 
+import java.util.HashSet;
 import java.util.List;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.larry.spring.dto.request.UpdateUserRequest;
 import com.larry.spring.dto.request.UserCreationRequest;
 import com.larry.spring.entity.User;
+import com.larry.spring.enums.Roles;
 import com.larry.spring.exception.AppException;
 import com.larry.spring.exception.ErrorCode;
 import com.larry.spring.mapper.UserMapper;
@@ -24,6 +25,7 @@ import lombok.experimental.FieldDefaults;
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
 
     public User createRequest(UserCreationRequest request) {
         if (userRepository.existsByName(request.getName())) {
@@ -31,8 +33,11 @@ public class UserService {
         }
 
         User user = userMapper.toUser(request);
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        HashSet<String> roles = new HashSet<>();
+        roles.add(Roles.USER.name());
+        user.setRoles(roles);
 
         return userRepository.save(user);
     }

@@ -1,6 +1,7 @@
 package com.larry.spring.dto.response;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,4 +20,5 @@ public class UserResponse {
     String firstName;
     String lastName;
     LocalDate dob;
+    Set<String> roles;
 }
