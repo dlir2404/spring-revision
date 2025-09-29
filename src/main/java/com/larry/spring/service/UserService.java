@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.larry.spring.dto.request.UpdateUserRequest;
 import com.larry.spring.dto.request.UserCreationRequest;
+import com.larry.spring.dto.response.UserResponse;
 import com.larry.spring.entity.User;
 import com.larry.spring.enums.Roles;
 import com.larry.spring.exception.AppException;
@@ -48,6 +49,11 @@ public class UserService {
 
     public User getUserById(String id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public UserResponse getMyInfo(String id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return userMapper.toUserResponse(user);
     }
 
     public User updateUser(String id, UpdateUserRequest request) {
