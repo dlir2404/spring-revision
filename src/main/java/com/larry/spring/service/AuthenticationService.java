@@ -3,15 +3,18 @@ package com.larry.spring.service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.larry.spring.dto.request.AuthenticationRequest;
 import com.larry.spring.dto.response.AuthenticationResponse;
 import com.larry.spring.dto.response.IntrospectResponse;
+import com.larry.spring.entity.User;
 import com.larry.spring.exception.AppException;
 import com.larry.spring.exception.ErrorCode;
 import com.larry.spring.repository.UserRepository;
@@ -50,7 +53,7 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.NAME_OR_PASSWORD_NOT_MATCH);
         }
 
-        String token = generateToken(user.getId());
+        String token = generateToken(user);
 
         return AuthenticationResponse.builder()
             .accessToken(token)
@@ -66,13 +69,14 @@ public class AuthenticationService {
     }
 
 
-    private String generateToken(String userId){
+    private String generateToken(User user){
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-            .subject(userId)
+            .subject(user.getId())
             .issuer("larry")
             .issueTime(new Date())
+            .claim("scope", buildScope(user))
             .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
             .build();
 
@@ -106,5 +110,13 @@ public class AuthenticationService {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private String buildScope(User user){
+        StringJoiner joiner = new StringJoiner(" ");
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+            user.getRoles().forEach(joiner::add);
+        }
+        return joiner.toString();
     }
 }
