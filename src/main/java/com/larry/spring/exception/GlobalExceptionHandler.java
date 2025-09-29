@@ -23,7 +23,8 @@ public class GlobalExceptionHandler {
         ApiResponse<String> response = new ApiResponse<>();
         response.setCode(e.getErrorCode().getCode());
         response.setMessage(e.getErrorCode().getMessage());
-        return ResponseEntity.status(e.getErrorCode().getCode()).body(response);
+
+        return ResponseEntity.status(e.getErrorCode().getStatusCode()).body(response);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
