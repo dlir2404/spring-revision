@@ -29,23 +29,21 @@ public class SecurityConfig {
     private String jwtSecret;
 
     private final String[] PUBLIC_URLS = {
-        "/users",
-        "/auth/login",
-        "/auth/introspect"
+            "/users",
+            "/auth/login",
+            "/auth/introspect"
     };
-    
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(authorize -> 
-                authorize.requestMatchers(HttpMethod.POST, PUBLIC_URLS).permitAll()
-                .requestMatchers(HttpMethod.GET, "/users").hasRole(Roles.ADMIN.name())
-                .anyRequest().authenticated()
-            );
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.POST, PUBLIC_URLS).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users").hasRole(Roles.ADMIN.name())
+                        .anyRequest().authenticated());
 
-        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(configurer -> 
-            configurer.decoder(jwtDecoder())
-            .jwtAuthenticationConverter(jwtAuthenticationConverter())));
+        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(configurer -> configurer.decoder(jwtDecoder())
+                .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
 
         return http.build();
     }
@@ -65,7 +63,7 @@ public class SecurityConfig {
         SecretKeySpec secretKeySpec = new SecretKeySpec(jwtSecret.getBytes(), JWSAlgorithm.HS256.getName());
 
         return NimbusJwtDecoder.withSecretKey(secretKeySpec).macAlgorithm(MacAlgorithm.HS256).build();
-    } 
+    }
 
     @Bean
     PasswordEncoder passwordEncoder() {
