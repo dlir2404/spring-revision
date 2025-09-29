@@ -14,6 +14,8 @@ public enum ErrorCode {
 
     NAME_OR_PASSWORD_NOT_MATCH(400, "Name or password not match", HttpStatus.BAD_REQUEST),
 
+    UNSUPPORTED_MEDIA_TYPE(415, "Unsupported media type", HttpStatus.UNSUPPORTED_MEDIA_TYPE),
+
     UNAUTHENTICATION(401, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(403, "You do not have permission", HttpStatus.FORBIDDEN),
 

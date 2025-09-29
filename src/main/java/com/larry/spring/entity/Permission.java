@@ -1,24 +1,23 @@
-package com.larry.spring.dto.response;
+package com.larry.spring.entity;
 
-import java.time.LocalDate;
-import java.util.Set;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class UserResponse {
-    String id;
+@Entity
+public class Permission {
+    @Id
     String name;
-    String firstName;
-    String lastName;
-    LocalDate dob;
-    // Set<String> roles;
+    String description;
 }

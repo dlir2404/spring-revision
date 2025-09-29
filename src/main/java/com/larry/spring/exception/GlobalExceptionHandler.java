@@ -2,6 +2,7 @@ package com.larry.spring.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,6 +36,15 @@ public class GlobalExceptionHandler {
         response.setMessage(ErrorCode.UNAUTHORIZED.getMessage());
 
         return ResponseEntity.status(ErrorCode.UNAUTHORIZED.getStatusCode()).body(response);
+    }
+
+    @ExceptionHandler(value = HttpMediaTypeNotSupportedException.class)
+    ResponseEntity<ApiResponse<String>> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) {
+        ApiResponse<String> response = new ApiResponse<>();
+        response.setCode(ErrorCode.UNSUPPORTED_MEDIA_TYPE.getCode());
+        response.setMessage(ErrorCode.UNSUPPORTED_MEDIA_TYPE.getMessage());
+
+        return ResponseEntity.status(ErrorCode.UNSUPPORTED_MEDIA_TYPE.getStatusCode()).body(response);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)

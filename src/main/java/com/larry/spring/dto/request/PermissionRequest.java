@@ -1,7 +1,4 @@
-package com.larry.spring.dto.response;
-
-import java.time.LocalDate;
-import java.util.Set;
+package com.larry.spring.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,11 +11,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class UserResponse {
-    String id;
+public class PermissionRequest {
     String name;
-    String firstName;
-    String lastName;
-    LocalDate dob;
-    // Set<String> roles;
+    String description;
 }

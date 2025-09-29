@@ -33,7 +33,7 @@ public class ApplicationInitConfig {
                     .name("admin")
                     .firstName("Admin")
                     .lastName("User")
-                    .roles(roles)
+                    // .roles(roles)
                     .password(passwordEncoder.encode("admin"))
                     .build();
 
