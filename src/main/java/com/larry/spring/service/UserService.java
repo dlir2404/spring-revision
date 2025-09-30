@@ -14,6 +14,7 @@ import com.larry.spring.enums.Roles;
 import com.larry.spring.exception.AppException;
 import com.larry.spring.exception.ErrorCode;
 import com.larry.spring.mapper.UserMapper;
+import com.larry.spring.repository.RoleRepository;
 import com.larry.spring.repository.UserRepository;
 
 import lombok.AccessLevel;
@@ -25,6 +26,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
     UserRepository userRepository;
+    RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
@@ -60,6 +62,10 @@ public class UserService {
         User user = getUserById(id);
 
         userMapper.updateUser(user, request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        var roles = roleRepository.findAllById(request.getRoles());
+        user.setRoles(new HashSet<>(roles));
 
         return userRepository.save(user);
     }

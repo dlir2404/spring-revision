@@ -6,13 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.larry.spring.dto.request.ApiResponse;
 import com.larry.spring.dto.request.PermissionRequest;
-import com.larry.spring.dto.request.UpdateUserRequest;
-import com.larry.spring.dto.request.UserCreationRequest;
 import com.larry.spring.dto.response.PermissionResponse;
-import com.larry.spring.dto.response.UserResponse;
-import com.larry.spring.entity.User;
 import com.larry.spring.service.PermissionService;
-import com.larry.spring.service.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
