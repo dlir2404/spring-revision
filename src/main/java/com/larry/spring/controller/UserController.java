@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,6 +41,7 @@ public class UserController {
     }
     
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<List<User>> getAllUsers() {
         ApiResponse<List<User>> response = new ApiResponse<>();
         response.setResult(userService.getAllUsers());

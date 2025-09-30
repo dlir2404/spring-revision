@@ -18,7 +18,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.larry.spring.enums.Roles;
 import com.nimbusds.jose.JWSAlgorithm;
 
 @Configuration
@@ -29,7 +28,6 @@ public class SecurityConfig {
     private String jwtSecret;
 
     private final String[] PUBLIC_URLS = {
-            "/users",
             "/auth/login",
             "/auth/introspect"
     };
@@ -38,7 +36,6 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.POST, PUBLIC_URLS).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users").hasRole(Roles.ADMIN.name())
                         .anyRequest().authenticated());
 
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(configurer -> configurer.decoder(jwtDecoder())
