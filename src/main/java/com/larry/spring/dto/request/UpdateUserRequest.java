@@ -3,6 +3,8 @@ package com.larry.spring.dto.request;
 import java.time.LocalDate;
 import java.util.Set;
 
+import com.larry.spring.validator.DobConstraint;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,8 @@ public class UpdateUserRequest {
     String password;
     String firstName;
     String lastName;
+
+    @DobConstraint(min = 18)
     LocalDate dob;
     Set<String> roles;
 }

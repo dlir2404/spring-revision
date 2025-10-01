@@ -5,19 +5,25 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+
+import com.larry.spring.validator.DobConstraint;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class UserCreationRequest {
-    private String name;
+    String name;
     
     @Size(min = 8, message = "Password must be at least 8 characters long")
-    private String password;
-    private String firstName;
-    private String lastName;
-    private LocalDate dob;
+    String password;
+    String firstName;
+    String lastName;
+
+    @DobConstraint(min = 18)
+    LocalDate dob;
 }
