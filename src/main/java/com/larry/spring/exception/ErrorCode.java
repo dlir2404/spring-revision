@@ -19,6 +19,7 @@ public enum ErrorCode {
     UNAUTHENTICATION(401, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(403, "You do not have permission", HttpStatus.FORBIDDEN),
 
+    INVALID_KEY(500, "Invalid error key", HttpStatus.BAD_REQUEST),
     UNCATEGORIZED_EXCEPTION(500, "Uncategorized exception", HttpStatus.INTERNAL_SERVER_ERROR);
 
     int code;
