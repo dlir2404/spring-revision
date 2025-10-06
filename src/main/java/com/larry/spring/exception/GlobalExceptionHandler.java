@@ -1,5 +1,8 @@
 package com.larry.spring.exception;
 
+import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -9,8 +12,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.larry.spring.dto.request.ApiResponse;
 
+import jakarta.validation.ConstraintViolation;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    private static final String MIN_ATTRIBUTE = "min";
+    private static final String MAX_ATTRIBUTE = "max";
+
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse<String>> handleException(Exception e) {
         System.err.println(e);
@@ -52,15 +60,31 @@ public class GlobalExceptionHandler {
         String enumKey = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
 
         ErrorCode errorCode = ErrorCode.INVALID_KEY;
+
+        Map<String, Object> attributes = null;
         try {
             errorCode = ErrorCode.valueOf(enumKey);
+
+            var constraintViolation = e.getBindingResult().getAllErrors().get(0).unwrap(ConstraintViolation.class);
+
+            attributes = constraintViolation.getConstraintDescriptor().getAttributes();
         } catch (IllegalArgumentException ex) {
 
         }
 
         ApiResponse<String> response = new ApiResponse<>();
         response.setCode(errorCode.getCode());
-        response.setMessage(errorCode.getMessage());
+        response.setMessage(Objects.nonNull(attributes) ? mapAttribute(errorCode.getMessage(), attributes) : errorCode.getMessage());
         return ResponseEntity.badRequest().body(response);
+    }
+
+    private String mapAttribute(String message, Map<String, Object> attributes) {
+        String minValue =  String.valueOf(attributes.get(MIN_ATTRIBUTE));
+        String maxValue = String.valueOf(attributes.get(MAX_ATTRIBUTE));
+
+        message = message.replace("{" + MIN_ATTRIBUTE + "}", minValue);
+        message = message.replace("{" + MAX_ATTRIBUTE + "}", maxValue);
+
+        return message;
     }
 }

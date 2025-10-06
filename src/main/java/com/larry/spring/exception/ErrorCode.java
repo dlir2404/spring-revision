@@ -12,6 +12,9 @@ public enum ErrorCode {
     USER_ALREADY_EXISTS(409, "User already exists", HttpStatus.CONFLICT),
     INVALID_REQUEST(400, "Invalid request", HttpStatus.BAD_REQUEST),
 
+    INVALID_PASSWORD(400, "Password must be at least {min} characters long", HttpStatus.BAD_REQUEST),
+    INVALID_DOB(400, "Must be at least {min} years old", HttpStatus.BAD_REQUEST),
+
     NAME_OR_PASSWORD_NOT_MATCH(400, "Name or password not match", HttpStatus.BAD_REQUEST),
 
     UNSUPPORTED_MEDIA_TYPE(415, "Unsupported media type", HttpStatus.UNSUPPORTED_MEDIA_TYPE),

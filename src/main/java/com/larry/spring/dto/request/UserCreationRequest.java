@@ -19,11 +19,11 @@ import com.larry.spring.validator.DobConstraint;
 public class UserCreationRequest {
     String name;
     
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Size(min = 8, message = "INVALID_PASSWORD")
     String password;
     String firstName;
     String lastName;
 
-    @DobConstraint(min = 18)
+    @DobConstraint(min = 18, message = "INVALID_DOB")
     LocalDate dob;
 }
