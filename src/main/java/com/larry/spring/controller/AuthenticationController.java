@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.larry.spring.dto.request.ApiResponse;
 import com.larry.spring.dto.request.AuthenticationRequest;
 import com.larry.spring.dto.request.IntrospectRequest;
+import com.larry.spring.dto.request.LogoutRequest;
 import com.larry.spring.dto.response.AuthenticationResponse;
 import com.larry.spring.dto.response.IntrospectResponse;
 import com.larry.spring.service.AuthenticationService;
@@ -41,4 +42,12 @@ public class AuthenticationController {
             .code(200)
             .build();
     }
+
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(@RequestBody LogoutRequest request) {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
+            .build();
+    }
+
 }
