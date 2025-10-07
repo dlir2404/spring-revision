@@ -15,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.larry.spring.dto.request.AuthenticationRequest;
 import com.larry.spring.dto.request.LogoutRequest;
+import com.larry.spring.dto.request.RefreshRequest;
 import com.larry.spring.dto.response.AuthenticationResponse;
 import com.larry.spring.dto.response.IntrospectResponse;
 import com.larry.spring.entity.InvalidatedToken;
@@ -65,6 +66,33 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(token)
                 .build();
+    }
+
+    public AuthenticationResponse refreshToken(RefreshRequest request) {
+        var signToken = verifyToken(request.getToken());
+
+        try {
+            var jwtId = signToken.getJWTClaimsSet().getJWTID();
+            var expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+
+            InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                    .id(jwtId)
+                    .expiryTime(expiryTime)
+                    .build();
+
+            invalidatedTokenRepository.save(invalidatedToken);
+
+            var userId = signToken.getJWTClaimsSet().getSubject();
+            var user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATION));
+
+            String token = generateToken(user);
+
+            return AuthenticationResponse.builder()
+                    .accessToken(token)
+                    .build();
+        } catch (ParseException e) {
+            throw new AppException(ErrorCode.UNAUTHENTICATION);
+        }
     }
 
     public void logout(LogoutRequest request) {

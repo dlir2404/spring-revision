@@ -23,7 +23,8 @@ public class SecurityConfig {
     private final String[] PUBLIC_URLS = {
             "/auth/login",
             "/auth/logout",
-            "/auth/introspect"
+            "/auth/introspect",
+            "/auth/refresh"
     };
 
     @Bean

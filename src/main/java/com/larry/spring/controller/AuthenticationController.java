@@ -9,6 +9,7 @@ import com.larry.spring.dto.request.ApiResponse;
 import com.larry.spring.dto.request.AuthenticationRequest;
 import com.larry.spring.dto.request.IntrospectRequest;
 import com.larry.spring.dto.request.LogoutRequest;
+import com.larry.spring.dto.request.RefreshRequest;
 import com.larry.spring.dto.response.AuthenticationResponse;
 import com.larry.spring.dto.response.IntrospectResponse;
 import com.larry.spring.service.AuthenticationService;
@@ -38,6 +39,16 @@ public class AuthenticationController {
         IntrospectResponse result = authenticationService.introspect(request.getToken());
 
         return ApiResponse.<IntrospectResponse>builder()
+            .result(result)
+            .code(200)
+            .build();
+    }
+
+    @PostMapping("/refresh")
+    public ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshRequest request) {
+        AuthenticationResponse result = authenticationService.refreshToken(request);
+
+        return ApiResponse.<AuthenticationResponse>builder()
             .result(result)
             .code(200)
             .build();
