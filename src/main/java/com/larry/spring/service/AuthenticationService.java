@@ -50,6 +50,14 @@ public class AuthenticationService {
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
 
+    @NonFinal
+    @Value("${jwt.valid-duration}")
+    protected long VALID_DURATION; // in minutes
+
+    @NonFinal
+    @Value("${jwt.refresh-duration}")
+    protected long REFRESH_DURATION; // in minutes
+
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var user = userRepository.findByName(request.getName())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -61,15 +69,18 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.NAME_OR_PASSWORD_NOT_MATCH);
         }
 
-        String token = generateToken(user);
+        String token = generateToken(user, false);
+        String refreshToken = generateToken(user, true);
 
         return AuthenticationResponse.builder()
                 .accessToken(token)
+                .refreshToken(refreshToken)
                 .build();
     }
 
     public AuthenticationResponse refreshToken(RefreshRequest request) {
-        var signToken = verifyToken(request.getToken());
+        var signToken = verifyToken(request.getAccessToken());
+        var refreshSignToken = verifyToken(request.getRefreshToken());
 
         try {
             var jwtId = signToken.getJWTClaimsSet().getJWTID();
@@ -82,13 +93,25 @@ public class AuthenticationService {
 
             invalidatedTokenRepository.save(invalidatedToken);
 
+            var refreshJwtId = refreshSignToken.getJWTClaimsSet().getJWTID();
+            var refreshExpiryTime = refreshSignToken.getJWTClaimsSet().getExpirationTime();
+
+            InvalidatedToken refreshInvalidatedToken = InvalidatedToken.builder()
+                    .id(refreshJwtId)
+                    .expiryTime(refreshExpiryTime)
+                    .build();
+
+            invalidatedTokenRepository.save(refreshInvalidatedToken);
+
             var userId = signToken.getJWTClaimsSet().getSubject();
             var user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATION));
 
-            String token = generateToken(user);
+            String token = generateToken(user, false);
+            String refreshToken = generateToken(user, true);
 
             return AuthenticationResponse.builder()
                     .accessToken(token)
+                    .refreshToken(refreshToken)
                     .build();
         } catch (ParseException e) {
             throw new AppException(ErrorCode.UNAUTHENTICATION);
@@ -96,9 +119,9 @@ public class AuthenticationService {
     }
 
     public void logout(LogoutRequest request) {
-        var signToken = verifyToken(request.getToken());
-
         try {
+            var signToken = verifyToken(request.getAccessToken());
+
             String jwtId = signToken.getJWTClaimsSet().getJWTID();
 
             Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
@@ -108,7 +131,17 @@ public class AuthenticationService {
                     .expiryTime(expiryTime)
                     .build();
 
+            var refreshSignToken = verifyToken(request.getRefreshToken());
+            String refreshJwtId = refreshSignToken.getJWTClaimsSet().getJWTID();
+            Date refreshExpiryTime = refreshSignToken.getJWTClaimsSet().getExpirationTime();
+
+            InvalidatedToken refreshInvalidatedToken = InvalidatedToken.builder()
+                    .id(refreshJwtId)
+                    .expiryTime(refreshExpiryTime)
+                    .build();
+
             invalidatedTokenRepository.save(invalidatedToken);
+            invalidatedTokenRepository.save(refreshInvalidatedToken);
         } catch (ParseException e) {
             throw new AppException(ErrorCode.UNAUTHENTICATION);
         }
@@ -128,7 +161,7 @@ public class AuthenticationService {
         }
     }
 
-    private String generateToken(User user) {
+    private String generateToken(User user, boolean isRefresh) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
@@ -137,7 +170,8 @@ public class AuthenticationService {
                 .issueTime(new Date())
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
-                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+                .expirationTime(new Date(Instant.now()
+                        .plus(isRefresh ? REFRESH_DURATION : VALID_DURATION, ChronoUnit.MINUTES).toEpochMilli()))
                 .build();
 
         Payload payload = new Payload(claimsSet.toJSONObject());
