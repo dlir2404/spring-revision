@@ -30,7 +30,7 @@ public class UserService {
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
-    public User createRequest(UserCreationRequest request) {
+    public UserResponse createRequest(UserCreationRequest request) {
         if (userRepository.existsByName(request.getName())) {
             throw new AppException(ErrorCode.USER_ALREADY_EXISTS);
         }
@@ -42,7 +42,7 @@ public class UserService {
         roles.add(Roles.USER.name());
         // user.setRoles(roles);
 
-        return userRepository.save(user);
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 
     public List<User> getAllUsers() {
